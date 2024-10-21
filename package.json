@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "node src/server.js",
+    "dev": "node server.js",
     "client": "node client.js"
   },
   "keywords": [],

@@ -1,7 +1,9 @@
 import net from 'net';
-import { writeHeader, readHeader } from './utils.js';
+import { readHeader, writeHeader } from './utils.js';
+import { HANDLER_ID, TOTAL_LENGTH_SIZE } from './constants.js';
+
 // 서버에 연결할 호스트와 포트
-const HOST = '127.0.0.1';
+const HOST = 'localhost';
 const PORT = 5555;
 
 const client = new net.Socket();
@@ -9,26 +11,26 @@ const client = new net.Socket();
 client.connect(PORT, HOST, () => {
   console.log('Connected to server');
 
-  //   const lengthBuffer = Buffer.alloc(4);
-  //   lengthBuffer.writeInt32BE(data.length + 4, 0);
-  //   // 직렬화 스트링 -> 바이트 배열
-  //   const message = 'Hello';
-  //   const data = Buffer.from(message);
-
-  //   const buffer = Buffer.concat([lengthBuffer, data]);
-  //   client.write(buffer); // write 메서드로 버퍼 쓰기
   const message = 'Hello';
-  const buffer = Buffer.from(message);
+  const test = Buffer.from(message);
 
-  const header = writeHeader(buffer.length, 10);
-  const packet = Buffer.concat([header, buffer]);
+  const header = writeHeader(test.length, 11);
+  const packet = Buffer.concat([header, test]);
   client.write(packet);
 
-  //client.destroy();
+  // 1024바이트를 넘는 메시지 보내기
+  // const longMessage = 'V'.repeat(1024);
+  // const longMessageBuffer = Buffer.from(longMessage);
+
+  // const longHeaderBuffer = writeHeader(longMessageBuffer.length, 10);
+  // const longPacket = Buffer.concat([longHeaderBuffer, longMessageBuffer]);
+  // client.write(longPacket);
 });
 
 client.on('data', (data) => {
-  const { handlerId, length } = readHeader(data);
+  const buffer = Buffer.from(data); // 버퍼 객체의 메서드를 사용하기 위해 변환
+
+  const { handlerId, length } = readHeader(buffer);
   console.log(`handlerId: ${handlerId}`);
   console.log(`length: ${length}`);
 
@@ -45,10 +47,4 @@ client.on('close', () => {
 
 client.on('error', (err) => {
   console.error('Client error:', err);
-});
-
-process.on('SIGINT', () => {
-  client.end(() => {
-    process.exit(0);
-  });
 });

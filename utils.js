@@ -1,5 +1,6 @@
 import { TOTAL_LENGTH_SIZE, HANDLER_ID } from './constants.js';
 
+// 빅인디안은 순서대로, 리틀인디안은 역순
 export const readHeader = (buffer) => {
   return {
     length: buffer.readUInt32BE(0),
